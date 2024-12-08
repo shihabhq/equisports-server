@@ -60,7 +60,21 @@ async function run() {
         }
       }
     };
-    const getMyProducts = async (req, res) => {};
+    const getMyProducts = async (req, res) => {
+      const { userEmail } = req.query
+      try {
+        // Query MongoDB for products that match the userEmail
+        const products = await productCollection.find({ userEmail }).toArray();
+    
+        if (products.length === 0) {
+          return res.status(404).json({ message: 'No products found for this email.' });
+        }
+    
+        res.status(200).json(products);
+      } catch (error) {
+        res.status(500).json({ message: 'Error fetching products.' });
+      }
+    };
 
     const viewSingleProduct = async (req, res) => {};
 
