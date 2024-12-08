@@ -85,7 +85,6 @@ async function run() {
         const query = { _id: new ObjectId(id) };
         const singleProduct = await productCollection.findOne(query);
 
-
         if (!singleProduct) {
           return res
             .status(404)
@@ -97,7 +96,24 @@ async function run() {
         res.status(500).json({ message: "Error fetching products." });
       }
     };
-    const updateProduct = async (req, res) => {};
+    const updateProduct = async (req, res) => {
+      const updatedProduct = req.body;
+
+      try {
+        const query = { _id: new ObjectId(updatedProduct._id) };
+        const update = { $set: updatedProduct };
+        const options = { upsert: true };
+
+        const result = await productCollection.updateOne(
+          query,
+          update,
+          options
+        );
+        res.send(result);
+      } catch (error) {
+        res.status(500).send("An Error Occured");
+      }
+    };
 
     const addProducts = async (req, res) => {
       const newProduct = req.body;
@@ -118,6 +134,7 @@ async function run() {
     };
 
     app.post("/products", addProducts);
+    app.put("/products", updateProduct);
     app.get("/home-products", getHomeProducts);
     app.get("/all-products", getAllProducts);
     app.get("/my-products", getMyProducts);
