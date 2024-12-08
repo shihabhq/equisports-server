@@ -101,21 +101,28 @@ async function run() {
         const query = { _id: new ObjectId(id) };
         const updatedProduct = req.body;
         const update = { $set: { ...updatedProduct } };
-        const options = {upsert:true}
+        const options = { upsert: true };
 
-        const result = await productCollection.updateOne(query, update,options);
-        console.log(result);
+        const result = await productCollection.updateOne(
+          query,
+          update,
+          options
+        );
+
         res.send(result);
       } catch (error) {
-        console.log(error);
         res.status(500).send("An Error Occured");
       }
     };
 
     const addProducts = async (req, res) => {
-      const newProduct = req.body;
-      const result = await productCollection.insertOne(newProduct);
-      res.send(result);
+      try {
+        const newProduct = req.body;
+        const result = await productCollection.insertOne(newProduct);
+        res.send(result);
+      } catch (error) {
+        res.status(500).send("unexpected Error occured");
+      }
     };
     const deleteProduct = async (req, res) => {
       const { id } = req.params;
