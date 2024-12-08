@@ -25,7 +25,6 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     const productCollection = client.db("productDB").collection("product");
 
@@ -61,7 +60,6 @@ async function run() {
       const { useremail } = req.query;
 
       try {
-        // Query MongoDB for products that match the userEmail
         const products = await productCollection
           .find({ email: useremail })
           .toArray();
@@ -97,20 +95,19 @@ async function run() {
       }
     };
     const updateProduct = async (req, res) => {
-      const updatedProduct = req.body;
+      const { id } = req.params;
 
       try {
-        const query = { _id: new ObjectId(updatedProduct._id) };
-        const update = { $set: updatedProduct };
-        const options = { upsert: true };
+        const query = { _id: new ObjectId(id) };
+        const updatedProduct = req.body;
+        const update = { $set: { ...updatedProduct } };
+        const options = {upsert:true}
 
-        const result = await productCollection.updateOne(
-          query,
-          update,
-          options
-        );
+        const result = await productCollection.updateOne(query, update,options);
+        console.log(result);
         res.send(result);
       } catch (error) {
+        console.log(error);
         res.status(500).send("An Error Occured");
       }
     };
@@ -118,7 +115,6 @@ async function run() {
     const addProducts = async (req, res) => {
       const newProduct = req.body;
       const result = await productCollection.insertOne(newProduct);
-      console.log(result);
       res.send(result);
     };
     const deleteProduct = async (req, res) => {
@@ -134,7 +130,7 @@ async function run() {
     };
 
     app.post("/products", addProducts);
-    app.put("/products", updateProduct);
+    app.put("/products/:id", updateProduct);
     app.get("/home-products", getHomeProducts);
     app.get("/all-products", getAllProducts);
     app.get("/my-products", getMyProducts);
@@ -148,6 +144,6 @@ async function run() {
 }
 run().catch(console.dir);
 
-app.listen(5000, () => {
+app.listen(PORT, () => {
   console.log("app is running");
 });
