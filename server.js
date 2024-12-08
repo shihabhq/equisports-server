@@ -152,5 +152,5 @@ async function run() {
 run().catch(console.dir);
 
 app.listen(PORT, () => {
-  console.log("app is running");
+  console.log(`app is running on Port:${PORT}`);
 });
