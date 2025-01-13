@@ -1,10 +1,9 @@
+import * as dotenv from "dotenv";
+dotenv.config();
 import express from "express";
-
 import { MongoClient, ObjectId, ServerApiVersion } from "mongodb";
 import cors from "cors";
-import * as dotenv from "dotenv";
 
-dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 
@@ -25,13 +24,13 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    await client.connect();
+    // await client.connect();
     const productCollection = client.db("productDB").collection("product");
 
     const getHomeProducts = async (req, res) => {
       let cursor;
       try {
-        cursor = productCollection.find().limit(6);
+        cursor = productCollection.find().limit(8);
         const homeValues = await cursor.toArray();
         res.status(200).send(homeValues);
       } catch (error) {
@@ -72,7 +71,7 @@ async function run() {
 
         res.status(200).json(products);
       } catch (error) {
-        res.status(500).json({ message: "Error fetching products." });
+        res.status(500).json({ message: "No Product Found." });
       }
     };
 
@@ -144,7 +143,7 @@ async function run() {
     app.get("/product-details/:id", viewSingleProduct);
     app.delete("/delete-product/:id", deleteProduct);
 
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
   } catch (e) {
     console.log("failed to connect with the db");
   }
